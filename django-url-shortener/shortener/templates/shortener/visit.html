@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit URL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff9e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .result {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter Short URL</h1>
+        <div class="input-group">
+            <input type="text" id="short-url" placeholder="Enter Short URL">
+            <button class="btn" onclick="visitUrl()">Send Request</button>
+        </div>
+        <div id="error-message" class="error"></div>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function visitUrl() {
+            var shortUrl = document.getElementById('short-url').value.trim();
+            var errorMessage = document.getElementById('error-message');
+            var resultDiv = document.getElementById('result');
+            errorMessage.textContent = ''; // Clear any previous errors
+            resultDiv.textContent = ''; // Clear previous results
+
+            if (!shortUrl) {
+                errorMessage.textContent = 'Please enter a short URL.';
+                return;
+            }
+
+            // Remove extra quotes if they exist
+            shortUrl = shortUrl.replace(/^"|"$/g, ''); // Remove leading and trailing quotes
+
+            // Make the GET request to the backend
+            fetch(`/redirect/${encodeURIComponent(shortUrl)}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch the redirect data.');
+                    }
+                    return response.json(); // Parse JSON response
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error); // If there's an error in the response, throw it
+                    }
+
+                    // Display the original URL in the result div
+                    //resultDiv.innerHTML = `Original URL: <span class="original-url">${data.original_url}</span>`;
+
+                    // Optionally log the original URL to the console
+                    
+                })
+                .catch(error => {
+                    // Show error message
+                    errorMessage.textContent = error.message;
+                });
+        }
+    </script>
+</body>
+</html>

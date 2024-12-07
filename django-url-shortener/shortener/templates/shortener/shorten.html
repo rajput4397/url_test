@@ -1,0 +1,200 @@
+<!-- shorten_url.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shorten URL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f7ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter URL to Shorten</h1>
+        <div class="input-group">
+            <input type="text" id="url" placeholder="Enter URL here">
+            <button class="btn" onclick="shortenUrl()">Shorten URL</button>
+        </div>
+    </div>
+
+    <script>
+        function shortenUrl() {
+            var url = document.getElementById('url').value;
+            // Call API to shorten the URL here
+            alert('Shortening: ' + url);
+        }
+    </script>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shorten URL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f7ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+        .tiny-url {
+            font-weight: bold;
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter URL to Shorten</h1>
+        <div class="input-group">
+            <!-- URL Input -->
+            <input type="text" id="url" placeholder="Enter URL here">
+
+            <!-- Days Valid Input -->
+            <input type="number" id="days" placeholder="Enter number of days URL is valid for" min="1">
+
+            <!-- Submit Button -->
+            <button class="btn" onclick="shortenUrl()">Shorten URL</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function shortenUrl() {
+            var url = document.getElementById('url').value;
+            var days = document.getElementById('days').value;
+
+            // Validate input fields
+            if (!url || !days) {
+                alert('Please enter a valid URL and the number of days.');
+                return;
+            }
+
+            // Make POST request to Django API
+            fetch('/check-url/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url, expiration_time: days })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the API response
+                var resultDiv = document.getElementById('result');
+                if (data.message === "URL is available") {
+                    resultDiv.innerHTML = `Your tiny URL: <span class="tiny-url">/${data.tiny_url}</span>`;
+                } else if (data.message === "URL already in use") {
+                    resultDiv.innerHTML = `This URL has already been shortened: <span class="tiny-url">/${data.tiny_url}</span>`;
+                } else {
+                    resultDiv.innerHTML = `Error: ${data.error || 'Something went wrong!'}`;
+                }
+            })
+            .catch(error => {
+                // Handle errors
+                document.getElementById('result').innerHTML = 'Error: Unable to shorten the URL.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
+

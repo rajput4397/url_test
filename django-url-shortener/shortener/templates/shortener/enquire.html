@@ -1,0 +1,171 @@
+<!-- shortener/enquire.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquire Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enquire about a URL</h1>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <label for="short_url">Enter the shortened URL:</label>
+            <input type="text" id="short_url" name="short_url" placeholder="Enter URL to enquire about" required>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html> -->
+
+
+
+<!-- shortener/enquire.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquire Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        async function enquireURL(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            const shortURL = document.getElementById('short_url').value;
+            const responseContainer = document.getElementById('response');
+            
+            // Clear previous response
+            responseContainer.textContent = '';
+
+            try {
+                const response = await fetch(`/enquire_url/${encodeURIComponent(shortURL)}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseContainer.textContent = `Original URL: ${data.original_url}, Access Count: ${data.access_count}, Time Left to Expire: ${data.time_left_to_expire}`;
+                } else {
+                    const error = await response.json();
+                    responseContainer.textContent = `Error: ${error.error}`;
+                }
+            } catch (error) {
+                responseContainer.textContent = 'An error occurred while processing the request.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Enquire about a URL</h1>
+        <form onsubmit="enquireURL(event)">
+            {% csrf_token %}
+            <label for="short_url">Enter the shortened URL:</label>
+            <input type="text" id="short_url" name="short_url" placeholder="Enter URL to enquire about" required>
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="response" class="response"></div>
+    </div>
+</body>
+</html>
